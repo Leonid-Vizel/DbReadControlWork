@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Text;
 
-//Настраиваем НАШУ культуру древних русов (чтобы правильно double читал из файла)
+//Настраиваем культуру древних русов (чтобы правильно double читал из файла)
 CultureInfo cultureInfo = new CultureInfo("ru-RU");
 cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
 cultureInfo.NumberFormat.CurrencyDecimalSeparator = ".";
