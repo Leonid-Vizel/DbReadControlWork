@@ -1,6 +1,14 @@
 ﻿using DbReadControlWork;
 using System.Text;
 
+//Настраиваем НАШУ культуру древних русов (чтобы правильно double читал из файла)
+CultureInfo cultureInfo = new CultureInfo("ru-RU");
+cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
+cultureInfo.NumberFormat.CurrencyDecimalSeparator = ".";
+cultureInfo.NumberFormat.PercentDecimalSeparator = ".";
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
 //Подготовка нужных инструментов
 List<Tuple<Customer,Salesman>> final = new List<Tuple<Customer, Salesman>>();
 
