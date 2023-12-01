@@ -1,41 +1,41 @@
 ﻿using DbReadControlWork;
 using System.Text;
 
-//Настраиваем НАШУ культуру древних русов (чтобы правильно double читал из файла)
-CultureInfo cultureInfo = new CultureInfo("ru-RU");
-cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
-cultureInfo.NumberFormat.CurrencyDecimalSeparator = ".";
-cultureInfo.NumberFormat.PercentDecimalSeparator = ".";
-CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+const int _ntfsBlockSize = 4096;
+const string _salesmenFileName = "read-salesmen.txt";
+const string _customerFileName = "read-customers.txt";
 
 //Подготовка нужных инструментов
-List<Tuple<Customer,Salesman>> final = new List<Tuple<Customer, Salesman>>();
+var final = new List<FinalRow>();
 
 //Чтение в 1 цикл
-using (FileStream fsSalesman = new FileStream("read-salesmen.txt", FileMode.OpenOrCreate))
-using (FileStream fsCustomer = new FileStream("read-customers.txt", FileMode.OpenOrCreate))
-using (var streamReaderSalesman = new StreamReader(fsSalesman, Encoding.UTF8, true, 4096)) //4096 - потому что это размерность кластера в NTFS
-using (var streamReaderCustomer = new StreamReader(fsCustomer, Encoding.UTF8, true, 4096)) //4096 - потому что это размерность кластера в NTFS
+using (var salesmenStream = new FileStream(_salesmenFileName, FileMode.OpenOrCreate))
+using (var customerStream = new FileStream(_customerFileName, FileMode.OpenOrCreate))
+using (var salesmenReader = new StreamReader(salesmenStream, Encoding.UTF8, true, _ntfsBlockSize))
+using (var customerReader = new StreamReader(customerStream, Encoding.UTF8, true, _ntfsBlockSize))
 {
-    string? customerRow = streamReaderCustomer.ReadLine();
-    string? salesRow = streamReaderSalesman.ReadLine();
-    while (customerRow != null && salesRow != null)
+    string? customerRow = customerReader.ReadLine();
+    string? salesRow = salesmenReader.ReadLine();
+    while (salesRow != null && customerRow != null)
     {
-        Customer? customerResult = Customer.ParseRow(customerRow);
-        if (customerResult != null)
+        var salesman = Salesman.Parse(salesRow);
+        if (salesman != null)
         {
-            Salesman? salesResult = Salesman.ParseRow(salesRow);
-            while (salesResult != null && customerResult.SalesmanReference == salesResult.Id)
+            while (customerRow != null)
             {
-                if (customerResult?.City == salesResult?.City)
+                var customer = Customer.Parse(customerRow);
+                if (customer?.SalesmanReference != salesman.Id)
                 {
-                    final.Add(Tuple.Create(customerResult, salesResult));
+                    break;
                 }
-                customerRow = streamReaderCustomer.ReadLine();
-                salesResult = Salesman.ParseRow(salesRow);
+                if (customer?.City == salesman.City)
+                {
+                    final.Add(new FinalRow(salesman, customer));
+                }
+                customerRow = customerReader.ReadLine();
             }
         }
+        salesRow = salesmenReader.ReadLine();
     }
 }
 

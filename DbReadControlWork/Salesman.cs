@@ -5,13 +5,9 @@ public sealed class Salesman
     public int Id { get; set; }
     public string Name { get; set; } = null!;
     public string City { get; set; } = null!;
-    public List<Customer> Customers { get; set; } = null!;
-    public Salesman() : base()
-    {
-        Customers = new List<Customer>();
-    }
+    public Salesman() : base() { }
 
-    public static Salesman? ParseRow(string initialRow)
+    public static Salesman? Parse(string initialRow)
     {
         var splitted = initialRow.Split('|');
         if (splitted.Length != 3)

@@ -11,7 +11,7 @@ public sealed class Customer
     public string City { get; set; } = null!;
     public Customer() : base() { }
 
-    public static Customer? ParseRow(string initialRow)
+    public static Customer? Parse(string initialRow)
     {
         var splitted = initialRow.Split('|');
         if (splitted.Length != 4)
